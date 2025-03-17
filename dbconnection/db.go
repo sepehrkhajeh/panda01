@@ -1,30 +1,49 @@
 package dbconnection
 
 import (
+	"Panda/repositories"
 	"context"
+	"errors"
+	"log"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// Collection تابعی است که به پایگاه داده متصل شده و کالکشن "users" را بازمی‌گرداند.
-func Collection() (*mongo.Collection, error) {
-	// تنظیمات اتصال به پایگاه داده
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
-
-	// ایجاد کلاینت و اتصال به سرور
-	client, err := mongo.Connect(context.TODO(), clientOptions)
+func ConnectMongo(uri string, timeout time.Duration) (*mongo.Client, error) {
+	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
 	if err != nil {
 		return nil, err
 	}
 
-	// بررسی اتصال
-	err = client.Ping(context.TODO(), nil)
-	if err != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	if err := client.Connect(ctx); err != nil {
 		return nil, err
 	}
 
-	// دسترسی به کالکشن "users" در دیتابیس "nostr"
-	collection := client.Database("nostr").Collection("users")
-	return collection, nil
+	return client, nil
+}
+
+// متد اتصال به Repository ها
+func ConnectToRepo(repoName string) (interface{}, error) {
+	client, err := ConnectMongo("mongodb://localhost:27017", 10*time.Second)
+	if err != nil {
+		log.Println("خطا در اتصال به MongoDB:", err)
+		return nil, err
+	}
+
+	dic := map[string]interface{}{
+		"domains":    repositories.NewDomainRepository(client, "domains", 10*time.Second),
+		"users":      repositories.NewUserRepository(client, "users", 10*time.Second),
+		"identifier": repositories.NewUserRepository(client, "identifier", 10*time.Second),
+	}
+
+	repo, exists := dic[repoName]
+	if !exists {
+		return nil, errors.New("repository یافت نشد")
+	}
+	return repo, nil
 }
