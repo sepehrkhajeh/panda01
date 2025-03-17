@@ -1,4 +1,4 @@
-package DomainApp
+package domainapp
 
 import "github.com/go-playground/validator/v10"
 

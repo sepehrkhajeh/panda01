@@ -1,4 +1,4 @@
-module Panda
+module github.com/sepehrkhajeh/panda01
 
 go 1.21.2
 

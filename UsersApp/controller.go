@@ -1,11 +1,11 @@
-package UsersApp
+package usersapp
 
 import (
-	"Panda/repositories"
-	"Panda/schemas"
-	"Panda/validations"
-	"log"
 	"net/http"
+
+	"github.com/sepehrkhajeh/panda01/repositories"
+	"github.com/sepehrkhajeh/panda01/schemas"
+	"github.com/sepehrkhajeh/panda01/validations"
 
 	"github.com/labstack/echo/v4"
 )
@@ -18,7 +18,7 @@ func CreateUser(repo *repositories.UserRepasitory) echo.HandlerFunc {
 		if err := c.Bind(user); err != nil {
 			return err
 		}
-		
+
 		validate := validations.NewValidator()
 		if err := validate.Struct(user); err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
@@ -35,11 +35,7 @@ func CreateUser(repo *repositories.UserRepasitory) echo.HandlerFunc {
 			})
 		}
 
-		log.Printf("داده ورودی: %+v", user)
-		log.Printf("داده ورودی: %+v", c.Request().Body)
-		log.Printf("ctx {}--- %+v", ctx)
 		_, err = repo.Add(ctx, &schemas.UserSchema{PubKey: user.PubKey})
-		log.Printf("===================================%+v", ctx)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		}
@@ -63,7 +59,6 @@ func DeleteUser(repo *repositories.UserRepasitory) echo.HandlerFunc {
 				"error": "User does not exist",
 			})
 		}
-		log.Printf("===================================%+v", d)
 		if _, err := repo.Delete(ctx, d); err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, "Error deleting user")
 		}

@@ -1,10 +1,11 @@
-package IdentifierApp
+package identifierapp
 
 import (
-	"Panda/dbconnection"
-	"Panda/repositories"
 	"log"
 	"time"
+
+	"github.com/sepehrkhajeh/panda01/dbconnection"
+	"github.com/sepehrkhajeh/panda01/repositories"
 
 	"github.com/labstack/echo/v4"
 )

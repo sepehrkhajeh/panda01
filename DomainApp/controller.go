@@ -1,11 +1,12 @@
-package DomainApp
+package domainapp
 
 import (
-	"Panda/repositories"
-	"Panda/schemas"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/sepehrkhajeh/panda01/repositories"
+	"github.com/sepehrkhajeh/panda01/schemas"
 
 	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/bson"
@@ -64,7 +65,6 @@ func DetailDomain(repo *repositories.DomainRepository) echo.HandlerFunc {
 
 func UpdateDomain(repo *repositories.DomainRepository) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		// استفاده از map برای دریافت داده‌های به‌روزرسانی از کلاینت
 		updateData := make(map[string]interface{})
 		if err := c.Bind(&updateData); err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
@@ -73,7 +73,6 @@ func UpdateDomain(repo *repositories.DomainRepository) echo.HandlerFunc {
 		ctx := c.Request().Context()
 		domainParam := c.Param("domain")
 		updateData["updated_at"] = time.Now()
-		// بررسی وجود دامنه
 		d, err := repo.GetByFeild(ctx, "domain", domainParam)
 
 		if err != nil {

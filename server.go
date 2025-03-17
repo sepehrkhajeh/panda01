@@ -1,9 +1,9 @@
 package main
 
 import (
-	"Panda/DomainApp"
-	"Panda/IdentifierApp"
-	"Panda/UsersApp"
+	"github.com/sepehrkhajeh/panda01/domainapp"
+	"github.com/sepehrkhajeh/panda01/identifierapp"
+	"github.com/sepehrkhajeh/panda01/usersapp"
 
 	"github.com/labstack/echo/v4"
 )
@@ -11,8 +11,8 @@ import (
 func main() {
 
 	e := echo.New()
-	UsersApp.RegisterUserRoutes(e)
-	DomainApp.RegisterDomainRoutes(e)
-	IdentifierApp.RegisterIdentifierRoutes(e)
+	usersapp.RegisterUserRoutes(e)
+	domainapp.RegisterDomainRoutes(e)
+	identifierapp.RegisterIdentifierRoutes(e)
 	e.Logger.Fatal(e.Start(":8000"))
 }

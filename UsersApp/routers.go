@@ -1,15 +1,14 @@
-package UsersApp
+package usersapp
 
 import (
-	"Panda/dbconnection"
-	"Panda/repositories"
 	"log"
 	"time"
 
+	"github.com/sepehrkhajeh/panda01/dbconnection"
+	"github.com/sepehrkhajeh/panda01/repositories"
+
 	"github.com/labstack/echo/v4"
 )
-
-// RegisterUserRoutes ثبت روت‌های مربوط به کاربران
 
 func RegisterUserRoutes(e *echo.Echo) {
 	client, err := dbconnection.ConnectMongo("mongodb://localhost:27017", 10*time.Second)

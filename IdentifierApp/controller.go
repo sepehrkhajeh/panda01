@@ -1,67 +1,62 @@
-package IdentifierApp
+package identifierapp
 
 import (
-	"Panda/dbconnection"
-	"Panda/repositories"
-	"Panda/schemas"
-	"log"
+	"fmt"
+	"net/http"
+
+	"github.com/sepehrkhajeh/panda01/dbconnection"
+	"github.com/sepehrkhajeh/panda01/repositories"
+	"github.com/sepehrkhajeh/panda01/schemas"
 
 	"github.com/labstack/echo/v4"
 )
 
-// هندلر ایجاد شناسه جدید
 func CreateIdentifier(repo *repositories.IdentifierRepository) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		// Parse request body
 		req := new(IdentifierCreateRequest)
 		if err := c.Bind(req); err != nil {
-			return err
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid input"})
 		}
 		ctx := c.Request().Context()
 
-		// دریافت Repository مربوط به دامنه‌ها
+		// Connect to domain repository
 		dom, err := dbconnection.ConnectToRepo("domains")
 		if err != nil {
-			return c.JSON(500, map[string]string{"error": "مشکلی در سرور رخ داد"})
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "server error"})
 		}
-
-		// بررسی مقدار برگشتی از ConnectToRepo
 		if dom == nil {
-			return c.JSON(500, map[string]string{"error": "Repository دامنه یافت نشد"})
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "domain repository not found"})
 		}
 
-		// تبدیل نوع (Type Assertion)
 		domainRepo, ok := dom.(*repositories.DomainRepository)
 		if !ok {
-			log.Println("نوع برگشتی با *DomainRepository مطابقت ندارد")
-			return c.JSON(500, map[string]string{"error": "خطا در نوع Repository"})
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "invalid repository type"})
 		}
 
-		// دریافت دامنه با شناسه
 		d, err := domainRepo.GetByID(ctx, req.DomainID)
 		if err != nil {
-			log.Println("خطا در دریافت دامنه:", err)
-			return c.JSON(500, map[string]string{"error": "خطا در دریافت اطلاعات دامنه"})
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "error retrieving domain information"})
 		}
-
-		// بررسی وجود دامنه
 		if d == nil {
-			return c.JSON(400, map[string]string{"error": "دامنه یافت نشد"})
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "domain not found"})
 		}
 
-		// ساخت شناسه کامل
-		FullIdentifier := req.Name + "@" + d.Domain
-		identifier, err := repo.Add(ctx, schemas.IdentifierSchema{
+		fullIdentifier := fmt.Sprintf("%s@%s", req.Name, d.Domain)
+
+		// Create new identifier
+		newIdentifier := schemas.IdentifierSchema{
 			Name:           req.Name,
 			Pubkey:         req.Pubkey,
 			DomainID:       req.DomainID,
-			FullIdentifier: FullIdentifier,
-		})
-
-		if err != nil {
-			log.Println("خطا در ایجاد شناسه:", err)
-			return c.JSON(500, map[string]string{"error": "خطا در ایجاد شناسه"})
+			FullIdentifier: fullIdentifier,
 		}
 
-		return c.JSON(200, identifier)
+		identifier, err := repo.Add(ctx, newIdentifier)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "error creating identifier"})
+		}
+
+		return c.JSON(http.StatusOK, identifier)
 	}
 }

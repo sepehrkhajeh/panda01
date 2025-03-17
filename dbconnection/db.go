@@ -1,11 +1,12 @@
 package dbconnection
 
 import (
-	"Panda/repositories"
 	"context"
 	"errors"
 	"log"
 	"time"
+
+	"github.com/sepehrkhajeh/panda01/repositories"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

@@ -1,4 +1,4 @@
-package DomainApp
+package domainapp
 
 type DomainCreateResponse struct {
 	ID interface{} `json:"id"`
@@ -11,7 +11,6 @@ type DomainGetResponse struct {
 	DefaultTTL             uint32      `json:"default_ttl"`
 	Status                 string      `json:"status"`
 }
-
 
 type DomainCreateRequest struct {
 	Domain                 string `json:"domain"                    validate:"required,hostname"`

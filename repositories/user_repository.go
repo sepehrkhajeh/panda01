@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"Panda/schemas"
+	"github.com/sepehrkhajeh/panda01/schemas"
 	"context"
 	"errors"
 	"time"

@@ -1,10 +1,11 @@
 package repositories
 
 import (
-	"Panda/schemas"
 	"context"
 	"errors"
 	"time"
+
+	"github.com/sepehrkhajeh/panda01/schemas"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -53,24 +54,21 @@ func (r *DomainRepository) GetByFeild(ctx context.Context, fieldName string, val
 	return domain, nil
 
 }
-
 func (r *DomainRepository) GetByID(ctx context.Context, id string) (*schemas.DomainSchema, error) {
 	objectID, err := primitive.ObjectIDFromHex(id)
-
 	if err != nil {
 		return nil, err
 	}
 
-	domain := new(schemas.DomainSchema)
-
-	err = r.FindOne(ctx, bson.M{"_id": objectID}, domain)
+	result := new(schemas.DomainSchema)
+	err = r.FindOne(ctx, bson.M{"_id": objectID}, result)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, nil
 		}
 		return nil, err
 	}
-	return domain, nil
+	return result, nil
 }
 
 func (r *DomainRepository) GetAll(ctx context.Context, filter interface{}) (*[]schemas.DomainSchema, error) {

@@ -1,10 +1,11 @@
 package repositories
 
 import (
-	"Panda/schemas"
 	"context"
 	"errors"
 	"time"
+
+	"github.com/sepehrkhajeh/panda01/schemas"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

@@ -32,28 +32,18 @@ func (r *BaseRepository) InsertOne(ctx context.Context, document interface{}) (*
 
 }
 
-// func (r *BaseRepository) FindOne(ctx context.Context, filter interface{}, result interface{}) error {
-// 	collection := r.Client.Database(r.DBName).Collection(r.Collection)
-// 	ctx, cancel := context.WithTimeout(ctx, r.QueryTimeout)
-// 	defer cancel()
-
-// 	err := collection.FindOne(ctx, filter).Decode(result)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	return nil
-
-// }
 func (r *BaseRepository) FindOne(ctx context.Context, filter interface{}, result interface{}) error {
 	collection := r.Client.Database(r.DBName).Collection(r.Collection)
+	ctx, cancel := context.WithTimeout(ctx, r.QueryTimeout)
+	defer cancel()
 
-	if r.QueryTimeout > 0 {
-		var cancel context.CancelFunc
-		ctx, cancel = context.WithTimeout(ctx, r.QueryTimeout)
-		defer cancel()
+	err := collection.FindOne(ctx, filter).Decode(result)
+	if err != nil {
+		return err
 	}
-	return collection.FindOne(ctx, filter).Decode(result)
+
+	return nil
+
 }
 
 func (r *BaseRepository) FindAll(ctx context.Context, filter interface{}, results interface{}) error {
