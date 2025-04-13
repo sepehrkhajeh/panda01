@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/sepehrkhajeh/panda01/domainapp"
-	"github.com/sepehrkhajeh/panda01/identifierapp"
-	"github.com/sepehrkhajeh/panda01/usersapp"
+	domainapp "github.com/sepehrkhajeh/panda01/app/domain"
+	identifierapp "github.com/sepehrkhajeh/panda01/app/identifier"
+	usersapp "github.com/sepehrkhajeh/panda01/app/users"
 
 	"github.com/labstack/echo/v4"
 )

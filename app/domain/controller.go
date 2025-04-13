@@ -21,7 +21,6 @@ func CreateDomain(repo *repositories.DomainRepository) echo.HandlerFunc {
 		ctx := c.Request().Context()
 		validationErrors := ValidateData(*req)
 		if validationErrors != nil {
-			log.Printf("validation ====> %v", validationErrors)
 			return c.JSON(http.StatusBadRequest, validationErrors)
 		}
 		d, err := repo.GetByFeild(ctx, "domain", req.Domain)

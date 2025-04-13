@@ -2,49 +2,36 @@ package identifierapp
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
-	"github.com/sepehrkhajeh/panda01/dbconnection"
+	"github.com/labstack/echo/v4"
 	"github.com/sepehrkhajeh/panda01/repositories"
 	"github.com/sepehrkhajeh/panda01/schemas"
-
-	"github.com/labstack/echo/v4"
 )
 
-func CreateIdentifier(repo *repositories.IdentifierRepository) echo.HandlerFunc {
+func CreateIdentifier(identifierRepo *repositories.IdentifierRepository, domainRepo *repositories.DomainRepository) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		// Parse request body
+
 		req := new(IdentifierCreateRequest)
+
 		if err := c.Bind(req); err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid input"})
 		}
 		ctx := c.Request().Context()
 
-		// Connect to domain repository
-		dom, err := dbconnection.ConnectToRepo("domains")
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "server error"})
-		}
-		if dom == nil {
-			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "domain repository not found"})
-		}
-
-		domainRepo, ok := dom.(*repositories.DomainRepository)
-		if !ok {
-			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "invalid repository type"})
-		}
-
-		d, err := domainRepo.GetByID(ctx, req.DomainID)
+		domainData, err := domainRepo.GetByID(ctx, req.DomainID)
+		log.Print(domainData)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "error retrieving domain information"})
 		}
-		if d == nil {
+		if domainData == nil {
 			return c.JSON(http.StatusBadRequest, map[string]string{"error": "domain not found"})
 		}
 
-		fullIdentifier := fmt.Sprintf("%s@%s", req.Name, d.Domain)
+		fullIdentifier := fmt.Sprintf("%s@%s", req.Name, domainData.Domain)
 
-		// Create new identifier
+		log.Println(fullIdentifier)
 		newIdentifier := schemas.IdentifierSchema{
 			Name:           req.Name,
 			Pubkey:         req.Pubkey,
@@ -52,7 +39,14 @@ func CreateIdentifier(repo *repositories.IdentifierRepository) echo.HandlerFunc 
 			FullIdentifier: fullIdentifier,
 		}
 
-		identifier, err := repo.Add(ctx, newIdentifier)
+		reslut, err := identifierRepo.IsExist(ctx, "full_identifier", fullIdentifier)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "error retrieving identifier information"})
+		}
+		if reslut {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "identifier already exists"})
+		}
+		identifier, err := identifierRepo.Add(ctx, newIdentifier)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "error creating identifier"})
 		}

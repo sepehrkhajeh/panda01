@@ -65,3 +65,11 @@ func (r *IdentifierRepository) GetByFeild(ctx context.Context, fieldName string,
 	}
 	return result, nil
 }
+func (r *IdentifierRepository) IsExist(ctx context.Context, fieldName string, value interface{}) (bool, error) {
+	filter := bson.M{fieldName: value}
+	count, err := r.CountDocuments(ctx, filter)
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}

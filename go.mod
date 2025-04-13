@@ -1,6 +1,6 @@
 module github.com/sepehrkhajeh/panda01
 
-go 1.21.2
+go 1.24.1
 
 require (
 	github.com/go-playground/validator/v10 v10.25.0
@@ -30,4 +30,5 @@ require (
 	golang.org/x/sync v0.11.0 // indirect
 	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

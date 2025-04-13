@@ -4,19 +4,21 @@ import (
 	"log"
 	"time"
 
-	"github.com/sepehrkhajeh/panda01/dbconnection"
+	"github.com/sepehrkhajeh/panda01/infrastructures/database"
 	"github.com/sepehrkhajeh/panda01/repositories"
 
 	"github.com/labstack/echo/v4"
 )
 
 func RegisterDomainRoutes(e *echo.Echo) {
-	client, err := dbconnection.ConnectMongo("mongodb://localhost:27017", 10*time.Second)
+
+	cfg := database.Load("config.yaml")
+
+	dbInstance, err := database.Connect(*cfg)
 	if err != nil {
 		log.Fatal("خطا در اتصال به MongoDB:", err)
 	}
-
-	domainRepo := repositories.NewDomainRepository(client, "domain", 10*time.Second)
+	domainRepo := repositories.NewDomainRepository(dbInstance.Client, "domain", 10*time.Second)
 
 	domainGroup := e.Group("/domain")
 

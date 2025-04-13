@@ -1,0 +1,4 @@
+uri: "mongodb://localhost:27017"
+db_name: "panda01"
+connection_timeout_in_ms: 10000
+query_timeout_in_ms: 10000
